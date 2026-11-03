@@ -9,7 +9,6 @@ const env = {
   SYNC_MODE: "inprocess",
   REDIS_URL: "",
   SPA_DIST: "web/dist",
-  LANGSMITH_TEST_TRACKING: "false",
 };
 
 export default defineConfig({

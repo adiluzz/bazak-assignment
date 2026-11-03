@@ -194,7 +194,6 @@ def test_review_keeps_results_for_the_scripted_model(monkeypatch):
 
 
 @pytest.mark.eval
-@pytest.mark.langsmith
 def test_eval_phone_trajectory(client):
     created = client.post("/api/conversations").json()
     payload = client.post(f"/api/conversations/{created['id']}/turn", json={"text": "a phone under 500"}).json()

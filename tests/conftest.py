@@ -7,7 +7,6 @@ os.environ["AUTO_SYNC"] = "0"
 os.environ["EMBED_MODE"] = "hash"
 os.environ["SYNC_MODE"] = "inprocess"
 os.environ["REDIS_URL"] = ""
-os.environ["LANGSMITH_TEST_TRACKING"] = "false"
 
 import json
 from pathlib import Path
