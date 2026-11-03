@@ -154,7 +154,7 @@ cp .env.example .env
 docker compose up --build
 ```
 
-That starts Postgres, Redis, the API on http://localhost:8000, a Celery worker, and Celery beat. Put `OPENAI_API_KEY` in `.env` and set `FAKE_LLM=0` for `gpt-6-luna`. Leave `FAKE_LLM=1` to run with no key. The key stays in `.env`. The assignment mail is gitignored with the rest of `assignment/`.
+That starts Postgres, Redis, the API on http://localhost:8000, a Celery worker, and Celery beat. `.env.example` already sets `FAKE_LLM=0` and `EMBED_MODE=fastembed`. Put your OpenAI key in `OPENAI_API_KEY`. Set `FAKE_LLM=1` only to run with no key. The key stays in `.env`. The assignment mail is gitignored with the rest of `assignment/`.
 
 For development, start the database and Redis, then:
 

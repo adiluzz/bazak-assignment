@@ -5,14 +5,23 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: shop
-    ports:
-      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d shop"]
+      interval: 2s
+      timeout: 5s
+      retries: 20
+      start_period: 5s
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
   api:
     build: .
     ports:
@@ -24,25 +33,30 @@ services:
       CATALOG_SOURCE_URL: https://dummyjson.com
       SYNC_MODE: celery
       SYNC_INTERVAL_MINUTES: "60"
-      FAKE_LLM: "1"
-      EMBED_MODE: hash
+      FAKE_LLM: "${FAKE_LLM:-0}"
+      EMBED_MODE: "${EMBED_MODE:-fastembed}"
       AUTO_SYNC: "1"
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
   worker:
     build: .
     command: celery -A api.worker.celery_app worker --loglevel=info
     environment: *app
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
   beat:
     build: .
     command: celery -A api.worker.celery_app beat --loglevel=info
     environment: *app
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
 volumes:
   pgdata:

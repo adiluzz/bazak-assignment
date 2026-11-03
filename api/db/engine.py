@@ -1,3 +1,5 @@
+import time
+
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import Session, sessionmaker
 
@@ -50,6 +52,27 @@ def ensure_database(url: str) -> None:
                 conn.execute(text(f'CREATE DATABASE "{name}"'))
     finally:
         admin.dispose()
+
+
+def wait_for_database(settings: Settings | None = None, attempts: int = 30, delay: float = 1.0) -> None:
+    """Postgres can be up before Docker DNS will resolve its service name."""
+    settings = settings or get_settings()
+    last: Exception | None = None
+    for attempt in range(attempts):
+        probe = create_engine(settings.database_url, pool_pre_ping=True)
+        try:
+            with probe.connect() as conn:
+                conn.execute(text("SELECT 1"))
+            return
+        except Exception as exc:
+            last = exc
+            if attempt + 1 == attempts:
+                break
+            time.sleep(delay)
+        finally:
+            probe.dispose()
+    assert last is not None
+    raise last
 
 
 def init_db(settings: Settings | None = None) -> None:

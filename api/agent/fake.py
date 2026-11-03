@@ -14,6 +14,8 @@ def classify_route(text: str) -> str:
         return "chat"
     if "cheap" in lowered and "cool" in lowered:
         return "clarify"
+    if any(word in lowered for word in ("gift", "present", "girlfriend", "boyfriend")):
+        return "clarify"
     return "search"
 
 
@@ -80,8 +82,8 @@ class ScriptedChatModel(BaseChatModel):
                 )
         if tool_messages:
             titles = _titles(tool_messages)
-            if route == "clarify":
-                names = _catalog_names(tool_messages)
+            names = _catalog_names(tool_messages)
+            if route == "clarify" or (not titles and names):
                 found = f" I found {titles}." if titles else ""
                 shop = names or "beauty, phones, laptops, and home decoration"
                 return AIMessage(content=f"What should I look through? The shop has {shop}.{found}")

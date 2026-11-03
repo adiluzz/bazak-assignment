@@ -4,7 +4,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from api.agent.build import build_agent
 from api.agent.runs import RunRegistry
-from api.db.engine import init_db
+from api.db.engine import init_db, wait_for_database
 from api.settings import get_settings
 from api.worker.scheduler import maybe_start_scheduler
 
@@ -12,6 +12,7 @@ from api.worker.scheduler import maybe_start_scheduler
 @asynccontextmanager
 async def lifespan(app):
     settings = get_settings()
+    wait_for_database(settings)
     init_db(settings)
     from api.catalog.sync import ensure_vectors
 
